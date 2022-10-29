@@ -27,20 +27,25 @@ impl RSAPublicKey {
         }
     }
 
-    pub fn encrypt(&self, plaintext: &str) -> String {
+    pub fn encrypt(&self, plaintext: &str) -> Result<String, RSAError> {
         let plaintext_bytes = plaintext.as_bytes();
-        println!("Plaintext bytes: {:?}", plaintext_bytes);
         let plaintext_number = BigUint::from_bytes_be(plaintext_bytes);
-        println!("Plaintext number: {:?}", plaintext_number);
+        if plaintext_number.bits() > self.modulus.bits() {
+            return Err(RSAError::MessageSizeLimitExceeded(
+                format!(
+                    "Message bit size: {} exceeds modulus bit size: {}",
+                    plaintext_number.bits(),
+                    self.modulus.bits(),
+                )
+            ));
+        }
         let ciphertext_number = plaintext_number.modpow(
             &self.public_exponent,
             &self.modulus
         );
-        println!("Ciphertext number: {:?}", ciphertext_number);
         let ciphertext_bytes = ciphertext_number.to_bytes_be();
-        println!("Ciphertext bytes: {:?}", ciphertext_bytes);
         let ciphertext = encode(ciphertext_bytes);
-        ciphertext
+        Ok(ciphertext)
     }
 }
 
@@ -79,16 +84,12 @@ impl RSAPrivateKey {
 
     pub fn decrypt(&self, ciphertext: &str) -> Result<String, RSAError> {
         let ciphertext_bytes = decode(ciphertext)?;
-        println!("Decrypt: Ciphertext bytes: {:?}", ciphertext_bytes);
         let ciphertext_number = BigUint::from_bytes_be(&ciphertext_bytes);
-        println!("Decrypt: Ciphertext number: {:?}", ciphertext_number);
         let plaintext_number = ciphertext_number.modpow(
             &self.private_exponent,
             &self.public_key.modulus,
         );
-        println!("Decrypt: Plaintext number: {:?}", plaintext_number);
         let plaintext_bytes = plaintext_number.to_bytes_be();
-        println!("Decrypt: Plaintext bytes: {:?}", plaintext_bytes);
         let plaintext = String::from_utf8_lossy(&plaintext_bytes).to_string();
         Ok(plaintext)
     }

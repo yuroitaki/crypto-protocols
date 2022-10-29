@@ -1,4 +1,4 @@
 pub mod domain;
 mod error;
-pub mod lib;
+pub mod key;
 mod util;
