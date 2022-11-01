@@ -7,7 +7,8 @@ use num_bigint::BigUint;
 use num_traits::One;
 use rand::rngs::OsRng;
 
-const EXPONENT: u64 = 65537;
+// use the most commonly used value
+const PUBLIC_EXPONENT: u64 = 65537;
 
 #[derive(Clone, Debug)]
 pub struct RSAPublicKey {
@@ -68,8 +69,9 @@ impl RSAPrivateKey {
         let first_prime = prime::from_rng(bits, &mut rng)?;
         let second_prime = prime::from_rng(bits, &mut rng)?;
         let modulus = first_prime.clone() * second_prime.clone();
+        // Euler totient function φ(n) = (p − 1)(q − 1) is used 
         let totient = (first_prime - BigUint::one()) * (second_prime - BigUint::one());
-        let public_exponent = BigUint::from(EXPONENT);
+        let public_exponent = BigUint::from(PUBLIC_EXPONENT);
         let priv_exp = modular_inverse(&public_exponent.clone().into(), &totient.into());
         let private_exponent = BigUint::try_from(priv_exp)?;
         Ok(Self {
