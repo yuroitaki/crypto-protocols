@@ -1,8 +1,4 @@
-use crypto_protocols::rsa::{
-    domain::RSAType,
-    error::RSAError,
-    key::RSAPrivateKey
-};
+use crypto_protocols::rsa::{domain::RSAType, error::RSAError, key::RSAPrivateKey};
 use eyre::Result;
 
 #[test]

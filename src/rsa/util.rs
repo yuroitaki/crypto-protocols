@@ -1,9 +1,6 @@
 use num_bigint::BigInt;
 use num_integer::Integer;
-use num_traits::{
-    Zero,
-    identities::One,
-};
+use num_traits::{identities::One, Zero};
 
 pub fn modular_inverse(number: &BigInt, modulus: &BigInt) -> BigInt {
     if modulus.is_one() {
@@ -24,7 +21,7 @@ pub fn modular_inverse(number: &BigInt, modulus: &BigInt) -> BigInt {
         std::mem::swap(&mut num, &mut modu);
         std::mem::swap(&mut x, &mut inv);
     }
- 
+
     if inv < BigInt::zero() {
         inv += modulus;
     }

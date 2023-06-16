@@ -24,11 +24,7 @@ impl RSAPublicKey {
         }
     }
 
-    pub fn encrypt<T, F>(
-        &self,
-        plaintext: T,
-        encoding_func: Option<F>,
-    ) -> Result<String, RSAError>
+    pub fn encrypt<T, F>(&self, plaintext: T, encoding_func: Option<F>) -> Result<String, RSAError>
     where
         T: ToString,
         F: Fn(Vec<u8>) -> String,
@@ -47,7 +43,7 @@ impl RSAPublicKey {
         let ciphertext_bytes = ciphertext_number.to_bytes_be();
         let ciphertext = match encoding_func {
             Some(encode_func) => encode_func(ciphertext_bytes),
-            None => hex::encode(ciphertext_bytes)
+            None => hex::encode(ciphertext_bytes),
         };
         Ok(ciphertext)
     }
@@ -69,7 +65,7 @@ impl RSAPrivateKey {
         let first_prime = prime::from_rng(bits, &mut rng)?;
         let second_prime = prime::from_rng(bits, &mut rng)?;
         let modulus = first_prime.clone() * second_prime.clone();
-        // Euler totient function φ(n) = (p − 1)(q − 1) is used 
+        // Euler totient function φ(n) = (p − 1)(q − 1) is used
         let totient = (first_prime - BigUint::one()) * (second_prime - BigUint::one());
         let public_exponent = BigUint::from(PUBLIC_EXPONENT);
         let priv_exp = modular_inverse(&public_exponent.clone().into(), &totient.into());
@@ -95,7 +91,7 @@ impl RSAPrivateKey {
     {
         let ciphertext_bytes = match decoding_func {
             Some(decode_func) => decode_func(ciphertext)?,
-            None => hex::decode(ciphertext)?
+            None => hex::decode(ciphertext)?,
         };
         let ciphertext_number = BigUint::from_bytes_be(&ciphertext_bytes);
         let plaintext_number =
